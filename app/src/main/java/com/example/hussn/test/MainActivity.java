@@ -47,20 +47,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final int MY_PERMISSIONS_REQUEST = 1;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private static final String TAG = "Main Activity";
-    private Button StartBt;
-    private Button Send;
-    private Spinner Spin;
+    private Button StartBt; // Button used to initialize bluetooth
+    private Button Send; // Button used to send image or test data to connected bluetooth device
+    private Spinner Spin; // Spin list displaying all available bluetooth devices
     private ListView List;
-    private TextView Text;
-    private Button ConnectBt;
-    private ImageView Image;
-    private Button Select;
+    private TextView Text; // display selected bluetooth device
+    private Button ConnectBt; // establishes secure client connection to the tupperware
+    private ImageView Image; // displays image to be sent
+    private Button Select; // gives user options to select image to be sent
     public SpinAdapter mSpinner;
-    public BluetoothAdapter mBTAdapter;
-    public ArrayList<BluetoothDevice>BtDevicesArray=new ArrayList<>();
-    public ArrayList<String> BtDeviceList = new ArrayList<>();
-    public ArrayAdapter<String> ad;
-    public BluetoothDevice SelectedTuppy;
+    public BluetoothAdapter mBTAdapter; // Bluetooth adapter of phone
+    public ArrayList<BluetoothDevice>BtDevicesArray=new ArrayList<>(); // array containing nearby tupperware devices
+    public ArrayList<String> BtDeviceList = new ArrayList<>(); // array of names of the tupperware devices
+    public ArrayAdapter<String> ad; // not used
+    public BluetoothDevice SelectedTuppy; // Current tupperware device connected to
     private ParcelUuid[] TpUuid;
     private UUID TupUuid;
     public ArrayAdapter<String> SpinAdapter;
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+    //This receiver receives intent broadcast about the state changes to bluetooth
     private final BroadcastReceiver Receiver1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -96,14 +97,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         Log.d(TAG,"onReceive: STATE TURNING ON");
                         break;
                 }
-
-
             }
         }
     };
 
 
 
+    //This receiver receives intents containing found nearby bluetooth devices and adds it to the available bluetooth device list displayed
     private final BroadcastReceiver Receiver2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     };
 
+    // this receiver records the changes in the discoverability mode of the bluetooth
     private final BroadcastReceiver Receiver3 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     };
 
 
+    //Since the default password for all tupperware is 0000, this receiver cathces the password inquiry from the tupperware and sets the password
     String Pin ="0000";
     private final BroadcastReceiver Receiver4 = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -215,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_PAIRING_REQUEST);
         registerReceiver(Receiver4,filter);
 
+
+        //initializes bluetooth and starts searching for nearby tupperware
         StartBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,10 +230,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //startDiscover(); cannot be put here because enable discoverable requires permission and immediate
                 //request of starting discovery would result in a hold up. Instead startDiscover is initialize at Broadcast
                 //Receiver once permission is granted for discoverable
-
             }
         });
 
+        // Creates server socket connection with the selected tupperware
         ConnectBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        // Uploads image to the selected tupperware
         Send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -266,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        // Displays options of selecting images to be sent
         Select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -526,7 +532,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d(TAG, "SelectedTuppy is " + BtDevicesArray.get(position).getName());
         }
     }
-
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
